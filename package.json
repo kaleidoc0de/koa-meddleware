@@ -1,7 +1,7 @@
 {
-  "name": "meddleware",
-  "version": "3.0.3",
-  "description": "Configuration-based middleware registration for express.",
+  "name": "koa-meddleware",
+  "version": "2.0.0",
+  "description": "Configuration-based middleware registration for koa.",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -13,10 +13,13 @@
     "dryrun": "(TARBALL=`npm pack` ; tar ztvf $TARBALL ; rm -f $TARBALL)"
   },
   "keywords": [
-    "express",
+    "koa",
     "middleware"
   ],
-  "author": "Erik Toth <ertoth@paypal.com>",
+  "author": [
+    "Erik Toth <ertoth@paypal.com>",
+    "Martin Denyer <martin.denyer@engagecrm.co.uk>"
+  ],
   "licenses": [
     {
       "type": "Apache 2.0",
@@ -24,14 +27,15 @@
     }
   ],
   "devDependencies": {
-    "body-parser": "^1.0.2",
-    "cookie-parser": "^1.0.1",
-    "express": "^4.6.1",
     "istanbul": "^0.2.7",
     "jshint": "^2.5.0",
-    "morgan": "^1.0.0",
-    "serve-favicon": "^2.0.1",
-    "serve-static": "^1.0.4",
+    "koa": "^2.3.0",
+    "koa-body": "^2.3.0",
+    "koa-cookie": "^1.0.0",
+    "koa-favicon": "^2.0.0",
+    "koa-morgan": "^1.0.1",
+    "koa-send": "^4.1.0",
+    "koa-static": "^3.0.0",
     "shortstop": "^1.0.1",
     "shortstop-handlers": "^1.0.0",
     "shortstop-regex": "0.0.1",
@@ -39,13 +43,15 @@
     "tape": "^2.12.3"
   },
   "dependencies": {
+    "any-promise": "^1.3.0",
     "caller": "0.0.1",
-    "debuglog": "0.0.4",
-    "core-util-is": "^1.0.1"
+    "core-util-is": "^1.0.2",
+    "debuglog": "^1.0.1",
+    "koa-mount": "^3.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/krakenjs/meddleware.git"
+    "url": "git@github.com:kaleidoc0de/meddleware.git"
   },
   "bugs": {
     "url": "https://github.com/krakenjs/meddleware/issues"

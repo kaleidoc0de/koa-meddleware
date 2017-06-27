@@ -17,7 +17,8 @@
 
 var path = require('path');
 var caller = require('caller');
-var express = require('express');
+var koa = require('koa');
+var mount = require('koa-mount');
 var thing = require('core-util-is');
 var debug = require('debuglog')('meddleware');
 var RQ = require('./lib/rq');
@@ -58,7 +59,7 @@ function resolvery(basedir) {
         }
 
         return fn;
-    };
+    }
 }
 
 
@@ -114,13 +115,13 @@ function resolveImpl(root, config) {
  * @returns {Function}
  */
 function middleware(requestory, fns) {
-    fns = fns.filter(function (fn) { return !!fn; });
+    fns = fns.filter(function (fn) { return !!fn });
     var rq = requestory(fns.map(taskery));
-    return function composite(req, res, next) {
+    return function composite(ctx, next) {
         function complete(success, failure) {
             next(failure);
         }
-        rq(complete, { req: req, res: res });
+        rq(complete, { ctx });
     };
 }
 
@@ -131,8 +132,8 @@ function middleware(requestory, fns) {
  * @returns {Function}
  */
 function taskery(fn) {
-    return function requestor(requestion, value) {
-        fn(value.req, value.res, function (err) {
+    return function requestor(requestion, ctx) {
+        fn(ctx, function (err) {
             requestion(null, err);
         });
     };
@@ -174,56 +175,51 @@ function normalize(mountpath, route) {
     return mountpath;
 }
 
-
-module.exports = function meddleware(settings) {
-    var basedir, app;
-
+module.exports = function meddleware(app, settings) {
+    var basedir;
     // The `require`-ing module (caller) is considered the `basedir`
     // against which relative file paths will be resolved.
     // Don't like it? Then pass absolute module paths. :D
     basedir = path.dirname(caller());
 
-    function onmount(parent) {
-        var resolve, mountpath;
+    var resolve = resolvery(basedir);
 
-        // Remove the sacrificial express app.
-        parent._router.stack.pop();
+    util
+      .mapValues(settings, util.nameObject)
+      .filter(thing.isObject)
+      .sort(compare)
+      .forEach(function register(spec) {
+        var fn, eventargs, route;
+        if (!(fn = resolve(spec, spec.name))) {
+          return;
+        }
 
-        resolve = resolvery(basedir);
-        mountpath = app.mountpath;
+        eventargs = { config: spec };
 
-        util
-            .mapValues(settings, util.nameObject)
-            .filter(thing.isObject)
-            .sort(compare)
-            .forEach(function register(spec) {
-                var fn, eventargs, route;
+	      if('route' in spec)
+	      {
+          if (thing.isArray(spec.route)) {
+            route = spec.route.map(function (route) {
+              return route;//normalize(mountpath, route)
+            })
+          } else {
+            //route = normalize(mountpath, spec.route)
+          }
+        }
 
-                if (!(fn = resolve(spec, spec.name))) {
-                    return;
-                }
-
-                eventargs = { app: parent, config: spec };
-
-                if (thing.isArray(spec.route)) {
-                    route = spec.route.map(function (route) {
-                        return normalize(mountpath, route);
-                    });
-                } else {
-                    route = normalize(mountpath, spec.route);
-                }
-                
-                debug('registering', spec.name, 'middleware');
-
-                parent.emit('middleware:before', eventargs);
-                parent.emit('middleware:before:' + spec.name, eventargs);
-                parent.use(route, fn);
-                parent.emit('middleware:after:' + spec.name, eventargs);
-                parent.emit('middleware:after', eventargs);
-            });
-    }
-
-    app = express();
-    app.once('mount', onmount);
-    return app;
-};
+        fn = ('route' in spec) ?
+          mount(
+            route,
+            fn
+          ) :
+          fn;
+        console.log('spec', spec);
+        debug('registering', spec.name, 'middleware');
+        app.emit('middleware:before', eventargs);
+        app.emit('middleware:before:' + spec.name, eventargs);
+        app.use(fn);
+        app.emit('middleware:after:' + spec.name, eventargs);
+        app.emit('middleware:after', eventargs);
+      });
+  return app;
+}

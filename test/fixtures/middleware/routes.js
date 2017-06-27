@@ -1,33 +1,33 @@
-'use strict';
+'use strict'
 
 
 
-exports.routeA = function () {
-    return function routeA(req, res, next) {
-        res.locals.routeA = true;
-        next();
-    };
-};
+exports.routeA = () => {
+    return async(ctx, next) => {
+        ctx.res.locals.routeA = true
+        await next()
+    }
+}
 
 
-exports.routeB = function () {
-    return function routeB(req, res, next) {
-        res.locals.routeB = true;
-        next();
-    };
-};
+exports.routeB = () => {
+    return async(ctx, next) => {
+        ctx.res.locals.routeB = true
+        await next()
+    }
+}
 
 
-exports.routeC = function () {
-    return function routeC(req, res, next) {
-        res.locals.routeC = true;
-        next();
-    };
-};
+exports.routeC = () => {
+    return async(ctx, next) {
+        ctx.res.locals.routeC = true
+        await next()
+    }
+}
 
-exports.routeD = function () {
-    return function routeC(req, res, next) {
-        res.locals.routeD = true;
-        next();
-    };
-};
+exports.routeD = () => {
+    return async(ctx, next) {
+        ctx.res.locals.routeD = true
+        await next()
+    }
+}

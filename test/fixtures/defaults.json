@@ -3,7 +3,7 @@
         "enabled": true,
         "priority": 10,
         "module": {
-            "name": "serve-favicon",
+            "name": "koa-favicon",
             "arguments": [ "path:./fixtures/favicon.ico" ]
         }
     },
@@ -39,9 +39,8 @@
         "enabled": true,
         "priority": 70,
         "module": {
-            "name": "body-parser",
-            "method": "urlencoded",
-            "arguments": [{ "extended": true }]
+            "name": "koa-bodyparser",
+            "arguments": [{  }]
         }
     },
 

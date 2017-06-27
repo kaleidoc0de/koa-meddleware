@@ -3,7 +3,7 @@
         "enabled": true,
         "priority": 10,
         "module": {
-            "name": "serve-favicon",
+            "name": "koa-favicon",
             "arguments": [ "path:./fixtures/favicon.ico" ]
         }
     },
@@ -12,7 +12,7 @@
         "enabled": true,
         "priority": 30,
         "module": {
-            "name": "serve-static",
+            "name": "koa-static",
             "arguments": [ "path:./.build" ]
         }
     },
@@ -23,8 +23,8 @@
         "enabled": true,
         "priority": 60,
         "module": {
-            "name": "body-parser",
-            "method": "json"
+            "name": "koa-body",
+            "arguments": [{ "urlencoded": false }]
         }
     },
 
@@ -32,9 +32,9 @@
         "enabled": true,
         "priority": 70,
         "module": {
-            "name": "body-parser",
+            "name": "koa-body",
             "method": "urlencoded",
-            "arguments": [{ "extended": true }]
+            "arguments": [{ "json": false }]
         }
     },
 

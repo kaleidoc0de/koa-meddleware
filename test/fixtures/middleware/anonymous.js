@@ -1,8 +1,8 @@
 'use strict';
 
 
-module.exports = function () {
-    return function (req, res, next) {
-        next();
-    };
-};
+module.exports = () => {
+    return function (ctx, next) {
+        await next()
+    }
+}

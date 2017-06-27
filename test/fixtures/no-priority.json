@@ -3,7 +3,7 @@
         "enabled": true,
         "priority": 1,
         "module": {
-            "name": "morgan",
+            "name": "koa-morgan",
             "arguments": [ "combined" ]
         }
     },
@@ -11,7 +11,7 @@
     "favicon": {
         "enabled": true,
         "module": {
-            "name": "serve-favicon",
+            "name": "koa-favicon",
             "arguments": [ "path:./fixtures/favicon.ico" ]
         }
     },
@@ -19,7 +19,7 @@
     "static": {
         "enabled": true,
         "module": {
-            "name": "serve-static",
+            "name": "koa-static",
             "arguments": [ "path:./.build" ]
         }
     }

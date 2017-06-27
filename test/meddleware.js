@@ -2,12 +2,12 @@
 
 
 var test = require('tape'),
-    express = require('express'),
+    koa = require('koa'),
     request = require('supertest'),
     shortstop = require('shortstop'),
     handlers = require('shortstop-handlers'),
     ssRegex = require('shortstop-regex'),
-    meddle = require('../');
+    meddle = require('../')
 
 function Resolver() {
     var _resolver = shortstop.create();
@@ -20,42 +20,36 @@ function Resolver() {
 
 var resolve = Resolver();
 
-
 test('meddleware', function (t) {
-
     t.test('empty config', function (t) {
         var app;
-
-        app = express();
-        app.use(meddle(require('./fixtures/empty')));
-
-        t.equal(app._router.stack.length, 2, 'app middleware stack length is default length');
-        t.equal(app._router.stack[0].handle.name, 'query', 'middleware stack contains default "query" middleware');
-        t.equal(app._router.stack[1].handle.name, 'expressInit', 'middleware stack contains default "expressInit" middleware');
+        app = meddle(new koa(), require('./fixtures/empty'));
+        let n = 0;
+        t.equal(app.middleware.length, 0, 'app middleware stack length is default length');
         t.end();
     });
 
-
+/*
     t.test('built-in middleware config', function (t) {
-        var config, names, app;
+        var config, names, app
 
-        config = require('./fixtures/defaults');
-        names = Object.keys(config);
+        config = require('./fixtures/defaults')
+        names = Object.keys(config)
 
         resolve(config, function (err, config) {
-            app = express();
-            app.use(meddle(config));
-
-            t.equal(app._router.stack.length, names.length + 2, 'middleware stack is appropriate length');
+            app = new koa()
+            app.use(meddle(config))
+            console.log('fist mw', app.middleware)
+            t.equal(app.middleware.length, names.length + 1, 'middleware stack is appropriate length');
             names.forEach(function (name, i) {
-                var handle = app._router.stack[i + 2].handle;
+                var handle = app.middleware[i + 2].name;
                 t.equal(typeof handle, 'function', 'middleware is correctly defined');
                 t.ok(handle.name.match(new RegExp(name, 'i')), 'middleware name is correct');
             });
             t.end();
         });
     });
-
+*/
 
     t.test('not defined property', function (t) {
         var config, app;
@@ -63,10 +57,9 @@ test('meddleware', function (t) {
         config = require('./fixtures/undefined');
 
         resolve(config, function (err, config) {
-            app = express();
-            app.use(meddle(config));
+            app = meddle(new koa(), (config));
 
-            t.equal(app._router.stack.length, 6, 'middleware stack is appropriate length');
+            t.equal(app.middleware.length, 4, 'middleware stack is appropriate length');
             t.end();
         });
 
@@ -82,10 +75,10 @@ test('priority', function (t) {
 
         config = require('./fixtures/no-priority');
         resolve(config, function (err, config) {
-            app = express();
+            app = new koa();
             app.use(meddle(config));
 
-            entry = app._router.stack[2];
+            entry = app.middleware[2];
             t.ok(entry, 'position 2 middleware exists');
             t.equal(typeof entry.handle, 'function', 'position 2 middleware is a function');
             t.ok(entry.handle.name.match(/favicon/i), 'position 2 middleware has the expected name');
@@ -120,7 +113,7 @@ test('module', function (t) {
         t.throws(function() {
             var app;
             try {
-                app = express();
+                app = koa();
                 app.use(meddle(config));
             } catch (e) {
                 t.ok(e instanceof TypeError, 'error is TypeError');
@@ -145,7 +138,7 @@ test('module', function (t) {
         t.throws(function() {
             var app;
             try {
-                app = express();
+                app = koa();
                 app.use(meddle(config));
             } catch (e) {
                 t.ok(e instanceof TypeError, 'error is TypeError');
@@ -162,7 +155,7 @@ test('module', function (t) {
         var app;
         t.throws(function() {
             try {
-                app = express();
+                app = new koa();
                 app.use(meddle(require('./fixtures/missing')));
             } catch (e) {
                 t.ok(e instanceof Error);
@@ -186,7 +179,7 @@ test('factories', function (t) {
 
         config = require('./fixtures/factories');
         names = Object.keys(config);
-        app = express();
+        app = new koa();
         app.use(meddle(config));
 
         t.equal(app._router.stack.length, names.length + 2, 'middleware stack is correct length');
@@ -213,7 +206,7 @@ test('enabled', function (t) {
         });
 
         resolve(config, function (err, config) {
-            app = express();
+            app = new koa();
             app.use(meddle(config));
 
             t.equal(app._router.stack.length, 3, 'middleware stack is appropriate length');
@@ -238,7 +231,7 @@ test('enabled', function (t) {
         });
 
         resolve(config, function (err, config) {
-            app = express();
+            app = new koa();
             app.use(meddle(config));
 
             t.equal(app._router.stack.length, 3, 'middleware stack is appropriate length');
@@ -264,7 +257,7 @@ test('events', function (t) {
         config = require('./fixtures/defaults');
 
         resolve(config, function (err, config) {
-            app = express();
+            app = new koa();
 
             app.on('middleware:before', function () {
                 events += 1;
@@ -287,7 +280,7 @@ test('events', function (t) {
         config = require('./fixtures/defaults');
         resolve(config, function (err, config) {
             events = 0;
-            app = express();
+            app = new koa();
 
             app.on('middleware:before:favicon', function (eventargs) {
                 t.equal(eventargs.app, app);
@@ -327,7 +320,7 @@ test('error middleware', function (t) {
 
         config = require('./fixtures/error');
 
-        app = express();
+        app = new koa();
 
         // Putting the route before meddle() to ensure the router is seen first
         app.get('/', function (req, res) {
@@ -363,7 +356,7 @@ test('routes', function (t) {
 
         config = require('./fixtures/routes');
         resolve(config, function (err, config) {
-            app = express();
+            app = new koa();
             app.use(meddle(config));
 
             app.get('/', function (req, res) {
@@ -430,7 +423,7 @@ test('routes', function (t) {
 
         config = require('./fixtures/array-routes');
         resolve(config, function (err, config) {
-            app = express();
+            app = new koa();
             app.use(meddle(config));
 
             app.get('/', function (req, res) {
@@ -498,7 +491,7 @@ test('routes', function (t) {
 
         config = require('./fixtures/routes');
 
-        app = express();
+        app = new koa();
         app.use('/bam', meddle(config));
 
         app.get('/bam', function (req, res) {
@@ -553,7 +546,7 @@ test('routes', function (t) {
         config = require('./fixtures/array-routes');
 
         resolve(config, function (err, config) {
-            app = express();
+            app = new koa();
             app.use('/bam', meddle(config));
 
             app.get('/bam', function (req, res) {
@@ -624,7 +617,7 @@ test('composition', function (t) {
 
         config = require('./fixtures/parallel');
 
-        app = express();
+        app = new koa();
         app.use(meddle(config));
 
         app.get('/', function (req, res) {
@@ -661,7 +654,7 @@ test('composition', function (t) {
 
         config = require('./fixtures/race');
 
-        app = express();
+        app = new koa();
         app.use(meddle(config));
 
         app.get('/', function (req, res) {
@@ -695,7 +688,7 @@ test('composition', function (t) {
 
         config = require('./fixtures/fallback');
 
-        app = express();
+        app = new koa();
         app.use(meddle(config));
 
         app.get('/', function (req, res) {
@@ -719,16 +712,16 @@ test('use module as context in factory method', function (t) {
             server = request(app)
                 .get(route)
                 .end(function (err, res) {
-                    t.error(err, 'no response error');
-                    t.equal(typeof res, 'object', 'response is defined');
-                    t.equal(typeof res.body, 'object', 'response body is defined');
-                    cb(res.body);
-                });
+                    t.error(err, 'no response error')
+                    t.equal(typeof res, 'object', 'response is defined')
+                    t.equal(typeof res.body, 'object', 'response body is defined')
+                    cb(res.body)
+                })
         }
 
         config = require('./fixtures/context');
 
-        app = express();
+        app = new koa();
         app.use(meddle(config));
 
         app.get('/', function (req, res) {
