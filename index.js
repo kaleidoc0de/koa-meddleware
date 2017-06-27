@@ -213,7 +213,6 @@ module.exports = function meddleware(app, settings) {
             fn
           ) :
           fn;
-        console.log('spec', spec);
         debug('registering', spec.name, 'middleware');
         app.emit('middleware:before', eventargs);
         app.emit('middleware:before:' + spec.name, eventargs);
