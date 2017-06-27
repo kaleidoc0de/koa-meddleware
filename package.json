@@ -51,10 +51,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:kaleidoc0de/meddleware.git"
+    "url": "git@github.com:kaleidoc0de/koa-meddleware.git"
   },
   "bugs": {
     "url": "https://github.com/krakenjs/meddleware/issues"
   },
-  "homepage": "https://github.com/krakenjs/meddleware"
+  "homepage": "https://github.com/kaleidoc0de/koa-meddleware"
 }
