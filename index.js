@@ -91,7 +91,10 @@ function resolveImpl(root, config) {
 
     // If modulePath was not resolved lookup with config.name for meaningful error message.
     module = require(modulePath || config.name);
-
+	
+    // support default exported modules
+    if('default' in module) module = module.default;
+	
     // First, look for a factory method
     factory = module[config.method];
     if (!thing.isFunction(factory)) {
