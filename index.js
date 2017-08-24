@@ -93,7 +93,7 @@ function resolveImpl(root, config) {
     module = require(modulePath || config.name);
 
     // fix for default exports
-    if(typeof module === 'object' && default in module) {
+    if(typeof module === 'object' && 'default' in module) {
       module = module.default;
     };
 
